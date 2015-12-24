@@ -5,25 +5,18 @@ var gulp = require('gulp'),
   	gls = require('gulp-live-server');
  
 
-var source_paths = {
-    js: './develop/assets/js/*.js',
-    css: './develop/assets/css/*.css',
-    sass: './develop/assets/scss/*.scss',
-    imgs: './develop/assets/imgs/*',
-    app: './develop/app.js'
+var paths = {
+    js: './public/assets/js/*.js',
+    css: './public/assets/css/',
+    sass: './public/assets/scss/*.scss',
+    imgs: './public/assets/imgs/*',
+    main: './public/',
+    app: './public/app.js'
 };
 
-var dest_paths = {
-    js: './build/assets/js/',
-    css: './build/assets/css/',
-    sass: './build/assets/scss/',
-    imgs: './build/assets/imgs/',
-    main: './build/',
-};
 
 var watchConfig = [
-    './develop/assets/**/*',
-    './develop/app.js'
+    './public/assets/**/*'
 ];
 
 var webpackConfig = {
@@ -34,21 +27,17 @@ var webpackConfig = {
         filename: 'bundle.js'
     },
     module: {
-        loaders: [
-            { test: /\.jsx$/, loader: 'jsx-loader'},
+        loaders: [{ 
+                test: /\.jsx$/, 
+                loader: 'babel',
+                query: { presets:['react'] }
+            },
             { test: /\.json$/, loader: 'json-loader'}
         ]
     },
     node: {
-        // make "fs" module as empty object "{}" 
-        // since lokijs will require('fs') on browser environment
         fs: "empty"
     },
-    // plugins: [
-    //     new webpack.ProvidePlugin({
-    //         "Promise": "bluebird"
-    //     })
-    // ],
     stats: {
         colors: true
     },
@@ -57,46 +46,28 @@ var webpackConfig = {
 };
 
 var nodemonConfig = {
-    script: './build/app.js',
+    script: './public/server/app.js',
     ext: 'js',
-    watch: './build/*'
+    watch: 'public/server/app.js'
 };
 
-var path = dest_paths.main + 'app.js';
-var server = gls.new(path);
-
-gulp.task('webserver', function() {
-    server.start();
-});
-
 gulp.task('copy', function() {
-    gulp.src(source_paths.app).pipe(gulp.dest(dest_paths.main));
+    //gulp.src(source_paths.app).pipe(gulp.dest(dest_paths.main));
+    //gulp.src(source_paths.components).pipe(gulp.dest(dest_paths.components));
 });
 
 gulp.task('build', function() {
-    del(dest_paths.main + '/**/*', function(){
-        return gulp.src(source_paths.main)
-            .pipe(webpack(webpackConfig))
-            .pipe(gulp.dest(dest_paths.main));
+    /*
+    del(paths.main+"bundle.js", function(){
+        return 
     });
+    */
+    gulp.src(paths.main+"**/*").pipe(webpack(webpackConfig)).pipe(gulp.dest(paths.main));    
 });
 
 gulp.task('nodemon', function() {
     nodemon(nodemonConfig);
 });
 
-
- /*
- gulp.task('livereload', function() {
-    connect.server({
-        root: paths.destDir,
-        https: true,
-        livereload: true
-    });
-    // client files changed will also trigger compass
-    gulp.watch(watchConfig, ['compass', 'copy', 'reloadNow'])
-});
-*/
-
-gulp.task('default', ['build', 'copy', 'nodemon']);
-gulp.watch(watchConfig, ['build', 'copy']); //restart my server 
+gulp.task('default', ['build', 'nodemon']);
+gulp.watch(watchConfig, ['build']); //restart my server 
