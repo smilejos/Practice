@@ -1,4 +1,5 @@
 var React = require('react');
+
 module.exports = React.createClass({
     // We initialise its state by using the `props` that were passed in when it
     // was first rendered. We also want the button to be disabled until the
@@ -19,14 +20,13 @@ module.exports = React.createClass({
         );
     }
 });
-/*
-module.exports = React.createClass({
-    render: function render() {
-        return React.createElement(
-            "div",
-            null,
-            "Hello World"
-        );
-    }
-});
-*/
+
+// module.exports = React.createClass({
+//     render: function render() {
+//         return React.createElement(
+//             "div",
+//             null,
+//             "Hello World"
+//         );
+//     }
+// });
