@@ -1,3 +1,4 @@
+require('babel-core/register');
 /*
 require("babel-core").transform("code", {
   	plugins: ["transform-react-jsx"]

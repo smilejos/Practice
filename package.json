@@ -9,9 +9,12 @@
   "author": "Jos Tung",
   "license": "ISC",
   "babel": {
-      "plugins": ["transform-react-jsx"]  
+    "plugins": [
+      "transform-react-jsx"
+    ]
   },
   "devDependencies": {
+    "babel": "^6.3.26",
     "babel-core": "^6.3.26",
     "babel-loader": "^6.2.0",
     "babel-plugin-transform-react-jsx": "^6.3.13",
