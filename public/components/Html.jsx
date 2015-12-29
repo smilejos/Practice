@@ -1,32 +1,20 @@
 var React = require('react');
+//var Personal = require('Personal.jsx');
+var Personal = require('../components/Personal.jsx');
 
 module.exports = React.createClass({
-    // We initialise its state by using the `props` that were passed in when it
-    // was first rendered. We also want the button to be disabled until the
-    // component has fully mounted on the DOM
-    getInitialState: function() {
-        return {};
-    },
-
-  // Once the component has been mounted, we can enable the button
-    componentDidMount: function() {
-        
-    },
     render: function() {
         return (
-            <div>
-            	Hello Jos
-        	</div>
+            <html>
+                <head>
+                    <meta charSet="utf-8" />
+                    <title>Inotera</title>
+                </head>
+                <body>
+                    <div id="app" dangerouslySetInnerHTML={{__html: this.props.markup}}></div>
+                    <script src={this.props.host + 'bundle.js'}> </script>
+                </body>
+            </html>
         );
     }
 });
-
-// module.exports = React.createClass({
-//     render: function render() {
-//         return React.createElement(
-//             "div",
-//             null,
-//             "Hello World"
-//         );
-//     }
-// });

@@ -27,12 +27,14 @@ var webpackConfig = {
         filename: 'bundle.js'
     },
     module: {
-        loaders: [{ 
+        loaders: [
+            { 
                 test: /\.jsx$/, 
                 loader: 'babel',
                 query: { presets:['react'] }
-            },
-            { test: /\.json$/, loader: 'json-loader'}
+            },{ 
+                test: /\.json$/, loader: 'json-loader'
+            }
         ]
     },
     node: {
