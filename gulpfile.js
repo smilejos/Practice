@@ -29,9 +29,9 @@ var webpackConfig = {
     module: {
         loaders: [
             { 
-                test: /\.jsx$/, 
-                loader: 'babel',
-                query: { presets:['react'] }
+                test: /\.jsx$/,  loader: 'babel', query: { presets:['react'] }
+            },{ 
+                test: /\.js$/,  loader: 'babel', query: { presets:['react'] }
             },{ 
                 test: /\.json$/, loader: 'json-loader'
             }
@@ -71,5 +71,5 @@ gulp.task('nodemon', function() {
     nodemon(nodemonConfig);
 });
 
-gulp.task('default', ['build', 'nodemon']);
+gulp.task('default', ['build']);  //, 'nodemon'
 gulp.watch(watchConfig, ['build']); //restart my server 

@@ -1,20 +1,16 @@
 
 var React = require('react');
 var ReactRouter = require('react-router');
-var match = ReactRouter.match;
 var Router = ReactRouter.Router;
 var ReactDom = require('react-dom');
-var routes = require('../components/Router.jsx');
+var createHistory= require('history').createHistory;
+var routes = require('../../components/Router.jsx');
 
+var pathname = window.location.pathname,
+	search =  window.location.search,
+	search = window.location.search
+	location = pathname + search + search;
 
-const { pathname, search, hash } = window.location
-const location = `${pathname}${search}${hash}`
-
-// calling `match` is simply for side effects of
-// loading route/component code for the initial location
-match({ routes, location }, () => {
-  render(
-    <Router routes={routes} history={createHistory()} />,
-    document.getElementById('app')
-  )
+ReactRouter.match({ routes, location }, function(){
+  	React.render(<Router routes={routes} history={createHistory()} />, document.getElementById('app'));
 })
