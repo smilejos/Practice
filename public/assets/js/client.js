@@ -8,9 +8,11 @@ var routes = require('../../components/Router.jsx');
 
 var pathname = window.location.pathname,
 	search =  window.location.search,
-	search = window.location.search
-	location = pathname + search + search;
+	hash = window.location.hash
+	location = pathname + search + hash;
 
+console.log('location', pathname, search, hash);
 ReactRouter.match({ routes, location }, function(){
-  	React.render(<Router routes={routes} history={createHistory()} />, document.getElementById('app'));
+	console.log('location', location);
+  	ReactDom.render(<Router routes={routes} history={createHistory()} />, document.getElementById('app'));
 })

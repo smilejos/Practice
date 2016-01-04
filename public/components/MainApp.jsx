@@ -4,6 +4,7 @@ var React = require('react'),
 
 module.exports = React.createClass({
     render: function() {
+        console.log('render');
         return (
             <div>
                 <h1>App</h1>

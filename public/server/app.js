@@ -1,59 +1,47 @@
 var express = require('express'),
     http = require('http'),
     React = require('react'),
-    zlib = require('zlib'),
+    util = require('../server/util'),
     fs = require('fs'),
     ReactDOMServer = require('react-dom/server'),
     ReactRouter = require('react-Router'),
-    match = ReactRouter.match,
     RoutingContext = ReactRouter.RoutingContext,
     app = express(),
     DOM = React.DOM, body = DOM.body, div = DOM.div, script = DOM.script,
     Html = React.createFactory(require('../components/Html.jsx')),
-    MainApp = React.createFactory(require('../components/MainApp.jsx')),
     RouterApp = require('../components/Router.jsx');
 
 //app.use(express.static(__dirname + '/build/'));
 
 app.all('*', function(req, res){
-  console.log("=======",req.path);
+    console.log(req.url);
   if (req.url === '/favicon.ico') {
-    write('haha', 'text/plain', res)
-  }
-  else if (req.url === '/public/bundle.js') {
-    // serve JavaScript assets
-    fs.readFile('.'+ req.url, function(err, data){
-        console.log(data);
-        zlib.gzip(data, function(err, result){
-            res.writeHead(200, {
-              'Content-Length': result.length,
-              'Content-Type':'text/javascript',
-              'Content-Encoding': 'gzip'
-            });
-            res.write(result);
-            res.end();
+        util.write('haha', 'text/plain', res);
+    } else if (req.url === '/build/bundle.js') {
+        // serve JavaScript assets
+        console.log('file');
+        fs.readFile('.'+ req.url, function(err, data){
+            util.write(data, 'text/javascript', res);
         });
-    })
-  }
-  else {
-    // handle all other urls with React Router
-    match({routes:RouterApp, location:req.path}, function(error, redirectLocation, renderProps){
-        if (error) {
-            res.status(500).send(error.message)
-        } else if (redirectLocation) {
-            res.redirect(302, redirectLocation.pathname + redirectLocation.search)
-        } else if (renderProps) {
-            console.log(renderProps);
-            var output = ReactDOMServer.renderToStaticMarkup(Html({
-                host: '/public/',
-                markup: ReactDOMServer.renderToString(<RoutingContext  {...renderProps}/>)
-            }));
-            res.status(200).send(output);
-        } else {
-            res.status(404).send('Not found')
-        }
-    });
-  }
+    } else {
+        // handle all other urls with React Router
+        console.log('page');
+        ReactRouter.match({routes:RouterApp, location:req.path}, function(error, redirectLocation, renderProps){
+            if (error) {
+                util.writeError(error.message, res);
+            } else if (redirectLocation) {
+                util.redirect(redirectLocation, res);
+            } else if (renderProps) {
+                var output = ReactDOMServer.renderToStaticMarkup(Html({
+                    host: '/build/',
+                    markup: ReactDOMServer.renderToString(<RoutingContext  {...renderProps}/>)
+                }));
+                util.write(output, 'text/html', res);
+            } else {
+                util.writeNotFound(res);
+            }
+        });
+    }
 });
 
 app.get('/Html', function(req, res){

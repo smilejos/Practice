@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
-	webpack = require('gulp-webpack'),
+	gulpWebpack = require('gulp-webpack'),
+    webpack = require('webpack'),
 	nodemon = require('nodemon'),
 	del = require('del'),
   	gls = require('gulp-live-server');
@@ -11,15 +12,17 @@ var paths = {
     sass: './public/assets/scss/*.scss',
     imgs: './public/assets/imgs/*',
     main: './public/',
+    build: './build/',
     app: './public/app.js'
 };
 
 
 var watchConfig = [
-    './public/assets/**/*'
+    './public/assets/js/*.js'
 ];
 
 var webpackConfig = {
+    entry: './public/assets/js/client.js',
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
@@ -44,10 +47,20 @@ var webpackConfig = {
         colors: true
     },
     watch: true,
-    keepalive: true
+    keepalive: true,
+    plugins: [
+        // new webpack.optimize.OccurenceOrderPlugin(),
+        // new webpack.optimize.DedupePlugin(),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compressor: { warnings: false },
+        // })
+    ]
 };
 
 var nodemonConfig = {
+    execMap: {
+        js: 'babel-node'
+    },
     script: './public/server/app.js',
     ext: 'js',
     watch: 'public/server/app.js'
@@ -59,17 +72,12 @@ gulp.task('copy', function() {
 });
 
 gulp.task('build', function() {
-    /*
-    del(paths.main+"bundle.js", function(){
-        return 
-    });
-    */
-    gulp.src(paths.main+"**/*").pipe(webpack(webpackConfig)).pipe(gulp.dest(paths.main));    
+    gulp.src(paths.main+"**/*").pipe(gulpWebpack(webpackConfig)).pipe(gulp.dest(paths.build));    
 });
 
 gulp.task('nodemon', function() {
     nodemon(nodemonConfig);
 });
 
-gulp.task('default', ['build']);  //, 'nodemon'
-gulp.watch(watchConfig, ['build']); //restart my server 
+gulp.task('default', ['build', 'nodemon']);  //, 'nodemon'
+gulp.watch(watchConfig, ['build', 'nodemon']); //restart my server 

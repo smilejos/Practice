@@ -1,6 +1,4 @@
 var React = require('react');
-//var Personal = require('Personal.jsx');
-var Personal = require('../components/Personal.jsx');
 
 module.exports = React.createClass({
     render: function() {

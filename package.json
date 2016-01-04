@@ -3,15 +3,10 @@
   "version": "1.0.0",
   "description": "It is simple projection to practice react",
   "main": "index.js",
-  "scripts": {
-    "test": "no testing, LOL"
-  },
   "author": "Jos Tung",
   "license": "ISC",
-  "babel": {
-    "plugins": [
-      "transform-react-jsx"
-    ]
+  "scripts": {
+    "start": "webpack --progress && babel-node public/server/app.js"
   },
   "devDependencies": {
     "babel": "^6.3.26",
