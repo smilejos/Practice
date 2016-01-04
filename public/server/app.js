@@ -28,16 +28,20 @@ app.all('*', function(req, res){
         console.log('page');
         ReactRouter.match({routes:RouterApp, location:req.path}, function(error, redirectLocation, renderProps){
             if (error) {
+                console.log('Router 500');
                 util.writeError(error.message, res);
             } else if (redirectLocation) {
+                console.log('Router 303');
                 util.redirect(redirectLocation, res);
             } else if (renderProps) {
+                console.log('Router 200');
                 var output = ReactDOMServer.renderToStaticMarkup(Html({
                     host: '/build/',
                     markup: ReactDOMServer.renderToString(<RoutingContext  {...renderProps}/>)
                 }));
                 util.write(output, 'text/html', res);
             } else {
+                console.log('Router 400');
                 util.writeNotFound(res);
             }
         });
