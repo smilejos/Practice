@@ -9,7 +9,7 @@ var routes = require('../../components/Router.jsx');
 
 var pathname = window.location.pathname,
 	search =  window.location.search,
-	hash = window.location.hash
+	hash = window.location.hash,
 	location = pathname + search + hash;
 
 ReactRouter.match({ routes, location }, function(){
