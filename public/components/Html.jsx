@@ -10,6 +10,7 @@ module.exports = React.createClass({
                 </head>
                 <body>
                     <div id="app" dangerouslySetInnerHTML={{__html: this.props.markup}}></div>
+                    <link rel="stylesheet" href={this.props.host + 'style.css'} />
                     <script src={this.props.host + 'bundle.js'}> </script>
                 </body>
             </html>

@@ -1,5 +1,7 @@
 var gulp = require('gulp'),
 	gulpWebpack = require('gulp-webpack'),
+    compass = require('gulp-compass'),
+    minifyCSS = require('gulp-minify-css'),
     webpack = require('webpack'),
 	nodemon = require('nodemon'),
 	del = require('del'),
@@ -7,22 +9,22 @@ var gulp = require('gulp'),
  
 
 var paths = {
-    js: './public/assets/js/*.js',
-    css: './public/assets/css/',
-    sass: './public/assets/scss/*.scss',
-    imgs: './public/assets/imgs/*',
+    sass: './public/style/scss/',
+    imgs: './public/style/imgs/',
     main: './public/',
     build: './build/',
     app: './public/app.js'
 };
 
 
-var watchConfig = [
-    './public/assets/js/*.js'
-];
+var watchConfig = {
+    scss : './public/style/scss/*.scss',
+    components : './public/components/*.jsx',
+    server : './public/server/*.js'
+};
 
 var webpackConfig = {
-    entry: './public/assets/js/client.js',
+    entry: './public/client/client.js',
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
@@ -40,6 +42,9 @@ var webpackConfig = {
             }
         ]
     },
+    // sassLoader: {
+    //     includePaths: paths.sass
+    // },
     node: {
         fs: "empty"
     },
@@ -66,6 +71,21 @@ var nodemonConfig = {
     watch: 'public/server/app.js'
 };
 
+gulp.task('compass', function() {
+    gulp.src(paths.main)
+        .pipe(compass({
+            css: paths.build,
+            sass: paths.sass,
+            image: paths.imgs
+        }));
+        // .pipe(minifyCSS({
+        //     noAdvanced: false,
+        //     keepBreaks: true,
+        //     cache: true // this add-on is gulp only
+        // }))
+        // .pipe(gulp.dest(paths.build));
+});
+
 gulp.task('copy', function() {
     //gulp.src(source_paths.app).pipe(gulp.dest(dest_paths.main));
     //gulp.src(source_paths.components).pipe(gulp.dest(dest_paths.components));
@@ -79,5 +99,6 @@ gulp.task('nodemon', function() {
     nodemon(nodemonConfig);
 });
 
-gulp.task('default', ['build', 'nodemon']);  //, 'nodemon'
-gulp.watch(watchConfig, ['build', 'nodemon']); //restart my server 
+gulp.task('default', ['build', 'compass', 'nodemon']);  //, 'nodemon'
+gulp.watch(watchConfig.components, ['build']); //restart my server 
+gulp.watch(watchConfig.scss, ['compass']); //restart my server 

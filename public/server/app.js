@@ -3,6 +3,7 @@ var express = require('express'),
     React = require('react'),
     util = require('../server/util'),
     fs = require('fs'),
+    io = require('socket.io'),
     ReactDOMServer = require('react-dom/server'),
     ReactRouter = require('react-Router'),
     RoutingContext = ReactRouter.RoutingContext,
@@ -14,18 +15,21 @@ var express = require('express'),
 //app.use(express.static(__dirname + '/build/'));
 
 app.all('*', function(req, res){
-    console.log(req.url);
-  if (req.url === '/favicon.ico') {
+    var IdNo = process.env['USERNAME'];
+    if (req.url === '/favicon.ico') {
         util.write('haha', 'text/plain', res);
     } else if (req.url === '/build/bundle.js') {
         // serve JavaScript assets
-        console.log('file');
         fs.readFile('.'+ req.url, function(err, data){
             util.write(data, 'text/javascript', res);
         });
-    } else {
+    } else if (req.url === '/build/style.css') {
+        // serve JavaScript assets
+        fs.readFile('.'+ req.url, function(err, data){
+            util.write(data, 'text/css', res);
+        });
+    }else {
         // handle all other urls with React Router
-        console.log('page');
         ReactRouter.match({routes:RouterApp, location:req.path}, function(error, redirectLocation, renderProps){
             if (error) {
                 console.log('Router 500');
@@ -56,4 +60,17 @@ app.get('/Html', function(req, res){
 
 
 var server = app.listen(8080);
+var socket = io.listen(server);
+socket.sockets.on('connection', function(client) {    
+
+    client.on('send', function(data) {
+        socket.emit('receive', data);
+    });
+
+    client.on('disconnect', function() {
+        console.log('Server has disconnected');
+    });
+});
+
+
 console.log("Start server with port:8080")
