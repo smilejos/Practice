@@ -4,16 +4,17 @@ var express = require('express'),
     util = require('../server/util'),
     fs = require('fs'),
     io = require('socket.io'),
-    ReactDOMServer = require('react-dom/server'),
-    ReactRouter = require('react-Router'),
-    RoutingContext = ReactRouter.RoutingContext,
-    app = express(),
-    DOM = React.DOM, body = DOM.body, div = DOM.div, script = DOM.script,
-    Html = React.createFactory(require('../components/Html.jsx')),
-    RouterApp = require('../components/Router.jsx');
+    app = express();
+
+    // ReactDOMServer = require('react-dom/server'),
+    // ReactRouter = require('react-Router'),
+    // RoutingContext = ReactRouter.RoutingContext,
+    // DOM = React.DOM, body = DOM.body, div = DOM.div, script = DOM.script,
+    // Html = React.createFactory(require('../components/Html.jsx')),
+    // RouterApp = require('../components/Router.jsx');
 
 //app.use(express.static(__dirname + '/build/'));
-
+/*
 app.all('*', function(req, res){
     var IdNo = process.env['USERNAME'];
     if (req.url === '/favicon.ico') {
@@ -51,13 +52,23 @@ app.all('*', function(req, res){
         });
     }
 });
+*/
 
-app.get('/Html', function(req, res){
-      res.setHeader('Content-Type', 'text/html');
-      var element = React.createElement(Html, {});
-      res.end(ReactDOMServer.renderToString(element));
+app.get('/', function(req, res){
+    res.sendfile('./build/index.html');
 });
 
+app.get('/bundle.js', function(req, res){
+    fs.readFile('./build/bundle.js', function(err, data){
+        util.write(data, 'text/javascript', res);
+    });
+});
+
+app.get('/style.css', function(req, res){
+    fs.readFile('./build/style.css', function(err, data){
+        util.write(data, 'text/css', res);
+    });
+});
 
 var server = app.listen(8080);
 var socket = io.listen(server);

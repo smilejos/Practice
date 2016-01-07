@@ -24,7 +24,7 @@ var watchConfig = {
 };
 
 var webpackConfig = {
-    entry: './public/client/client.js',
+    entry: './public/client/client.jsx',
     resolve: {
         extensions: ['', '.js', '.jsx']
     },
@@ -36,10 +36,11 @@ var webpackConfig = {
             { 
                 test: /\.jsx$/,  loader: 'babel', query: { presets:['react'] }
             },{ 
-                test: /\.js$/,  loader: 'babel', query: { presets:['react'] }
-            },{ 
                 test: /\.json$/, loader: 'json-loader'
             }
+            /*,{ 
+                test: /\.js$/,  loader: 'babel', query: { presets:['react'] }
+            }*/
         ]
     },
     // sassLoader: {
@@ -64,7 +65,7 @@ var webpackConfig = {
 
 var nodemonConfig = {
     execMap: {
-        js: 'babel-node'
+        js: 'node'
     },
     script: './public/server/app.js',
     ext: 'js',
@@ -72,6 +73,7 @@ var nodemonConfig = {
 };
 
 gulp.task('compass', function() {
+    console.log('--------------compass--------------');
     gulp.src(paths.main)
         .pipe(compass({
             css: paths.build,
@@ -92,10 +94,12 @@ gulp.task('copy', function() {
 });
 
 gulp.task('build', function() {
+    console.log('--------------build--------------');
     gulp.src(paths.main+"**/*").pipe(gulpWebpack(webpackConfig)).pipe(gulp.dest(paths.build));    
 });
 
 gulp.task('nodemon', function() {
+    console.log('--------------nodemon--------------');
     nodemon(nodemonConfig);
 });
 

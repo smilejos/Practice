@@ -6,13 +6,13 @@ var React = require('react'),
     MainApp = require('../components/MainApp.jsx'),
     Default = require('../components/Default.jsx'),
     AboutView = require('../components/About.jsx'),
-    InboxView = require('../components/Inbox.jsx');
+    WorkspaceView = require('../components/Workspace.jsx');
 
 var routes = (
 	<Route path="/" component={MainApp} >
 		<IndexRoute component={Default} />
         <Route path="about" component={AboutView}/>
-        <Route path="inbox" component={InboxView}/>
+        <Route path="workspace" component={WorkspaceView}/>
     </Route>
 );
 
