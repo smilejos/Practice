@@ -74,12 +74,16 @@ var nodemonConfig = {
 
 gulp.task('compass', function() {
     console.log('--------------compass--------------');
+    del(paths.build + 'style.css', function(){
+        
+    });
     gulp.src(paths.main)
         .pipe(compass({
             css: paths.build,
             sass: paths.sass,
             image: paths.imgs
-        }));
+    }));
+    
         // .pipe(minifyCSS({
         //     noAdvanced: false,
         //     keepBreaks: true,

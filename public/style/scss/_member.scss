@@ -6,7 +6,7 @@
     width: 39px;
     height: 39px;
     cursor: pointer;
-    color: $DefaultColor;
+    border:1px #eee solid;
 }
 
 /**
@@ -17,12 +17,4 @@
     height : auto;
     max-height: 100%;
     max-width: 100%;
-}
-
-/**
- * all useravatar with circle tag will be
- * shapped as circle
- */
-.UserAvatar .circle {
-    border-radius: 150px;
 }

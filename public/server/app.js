@@ -1,11 +1,13 @@
 var express = require('express'),
+    session = require("express-session");
     http = require('http'),
     React = require('react'),
     util = require('../server/util'),
     fs = require('fs'),
     io = require('socket.io'),
-    app = express();
-
+    app = express(),
+    ntlm = require('express-ntlm'),
+    MemberControler = require('../server/MemberControler');
     // ReactDOMServer = require('react-dom/server'),
     // ReactRouter = require('react-Router'),
     // RoutingContext = ReactRouter.RoutingContext,
@@ -54,7 +56,26 @@ app.all('*', function(req, res){
 });
 */
 
+/*
+app.use(ntlm({
+    debug: function() {
+        var args = Array.prototype.slice.apply(arguments);
+        console.log.apply(null, args);
+    },
+    domain: 'inotera',
+    domaincontroller: 'ldap://inotera',
+}));
+*/
+
+app.use(ntlm());
+var sessionMiddleware = session({
+    secret: 'somesecrettoken'
+});
+
+app.use(sessionMiddleware);
+
 app.get('/', function(req, res){
+    req.session.user = req.ntlm;
     res.sendfile('./build/index.html');
 });
 
@@ -70,18 +91,30 @@ app.get('/style.css', function(req, res){
     });
 });
 
+MemberControler.initialize();
+
 var server = app.listen(8080);
 var socket = io.listen(server);
-socket.sockets.on('connection', function(client) {    
 
-    client.on('send', function(data) {
-        socket.emit('receive', data);
-    });
-
-    client.on('disconnect', function() {
-        console.log('Server has disconnected');
-    });
+socket.use(function(socket, next){
+    sessionMiddleware(socket.request, socket.request.res, next);
 });
 
+socket.sockets.on('connection', function(client) {        
+    var user = client.request.session.user;
+    var IdNo = user.UserName;
+    
+    MemberControler.setOnline(IdNo);
+    socket.emit('receiveRealTimeMember', {
+        List :  MemberControler.getOnlineList()
+    });
+    
+    client.on('disconnect', function() {
+        MemberControler.setOffline(IdNo);
+        socket.emit('receiveRealTimeMember', {
+            List :  MemberControler.getOnlineList()
+        });
+    });
+});
 
 console.log("Start server with port:8080")
