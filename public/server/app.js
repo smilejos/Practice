@@ -91,24 +91,47 @@ app.get('/style.css', function(req, res){
     });
 });
 
+app.get('/codeStyle.css', function(req, res){
+    fs.readFile('./node_modules/highlight.js/styles/github-gist.css', function(err, data){
+        util.write(data, 'text/css', res);
+    });
+});
+
+app.get('/markdown.css', function(req, res){
+    fs.readFile('./node_modules/github-markdown-css/github-markdown.css', function(err, data){
+        util.write(data, 'text/css', res);
+    });
+});
+
 MemberControler.initialize();
 
-var server = app.listen(8080);
+var server = app.listen(8888);
 var socket = io.listen(server);
 
 socket.use(function(socket, next){
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-socket.sockets.on('connection', function(client) {        
+socket.sockets.on('connection', function(client) {          
     var user = client.request.session.user;
-    var IdNo = user.UserName;
-    
-    MemberControler.setOnline(IdNo);
+    if( user) {
+        var IdNo = user.UserName;
+        client.join(IdNo); // 讓每一個 Member 加入自己的 Channel
+        MemberControler.setOnline(IdNo);    
+    }
+
     socket.emit('receiveRealTimeMember', {
         List :  MemberControler.getOnlineList()
     });
     
+    client.on('sendMessage', function(item) {
+        socket.to(item.Receiver).emit('receiveMessage', {
+            Sender : item.IdNo,
+            Message : item.Message,
+            DateTime : item.DateTime
+        });
+    });
+
     client.on('disconnect', function() {
         MemberControler.setOffline(IdNo);
         socket.emit('receiveRealTimeMember', {
@@ -117,4 +140,4 @@ socket.sockets.on('connection', function(client) {
     });
 });
 
-console.log("Start server with port:8080")
+console.log("Start server with port:8888")

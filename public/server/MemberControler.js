@@ -9,7 +9,7 @@ module.exports = function(){
 		};
 
 	var getRawDataFromDatabase = function(callback){
-		var sqlString = "select a.Id_no, a.Card_Na, b.Title_na from HRIS.dbo.Nemployee a left join HRIS.dbo.ztitle b on a.Title_no = b.Title_no";
+		var sqlString = "select a.Id_no, a.Card_Na, b.ETitle_na as Title_na  from HRIS.dbo.Nemployee a left join HRIS.dbo.ztitle b on a.Title_no = b.Title_no";
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
