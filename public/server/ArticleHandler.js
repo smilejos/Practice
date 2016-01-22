@@ -7,63 +7,73 @@ module.exports = function(){
 		    database: 'JustBlog'
 		};
 
-	var _getSpecificAuthor = function(Id_No){
+	var _getNewestArticle = function(callback){
+		var sqlString = " select top 20 ArticleNo, Title, Author, Tag, Dtime from dbo.Article " + 
+						" order by Dtime DESC ";
+		
+		sql.connect(config, function(err) {
+			var request = new sql.Request();
+	    	request.query(sqlString, function(err, recordset) {
+	    		callback(recordset);
+	    	});
+		});
+	}
+
+	var _getSpecificAuthor = function(Id_No, callback){
 		var sqlString = " select ArticleNo, Title, Author, Tag, Dtime from dbo.Article " + 
 						" where Author = '" + Id_No + "' order by Dtime DESC ";
 		
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		return recordset;
+	    		callback(recordset);
 	    	});
 		});
 	}
 
-	var _getSpecificTag = function(Tag){
+	var _getSpecificTag = function(Tag, callback){
 		var sqlString = " select ArticleNo, Title, Author, Tag, Dtime from dbo.Article " +
 						" where Tag = '" + Tag + "' order by Dtime DESC ";
 		
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		return recordset;
+	    		callback(recordset);
 	    	});
 		});
 	}
 
-	var _getSpecificArticle = function(ArticleNo){
+	var _getSpecificArticle = function(ArticleNo, callback){
 		var sqlString = " select ArticleNo, Title, Author, Content, Tag, Dtime " +
 						" from dbo.Article where ArticleNo = '" + ArticleNo + "'";
 		
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		return recordset;
+	    		callback(recordset);
 	    	});
 		});
 	}
 
-	var _modifyArticle = function(Article){
+	var _modifyArticle = function(Article, callback){
 		var sqlString = " update dbo.Article set Title = '"+ Article.Title +"', Content = '" +Article.Content+ "', Tag = '" +Article.Tag+ "', Dtime = getDate() where ArticleNo = '" + Article.ArticleNo + "'";
 		
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		console.log(recordset);
-	    		return recordset;
+	    		callback(recordset, err);
 	    	});
 		});
 	}
 
-	var _publishArticle = function(Article){
+	var _publishArticle = function(Article, callback){
 		var sqlString = " insert into  dbo.Article (Title, Author, Content, Tag, Dtime) "+
 		                " values ('" +Article.Title +"','"+ Article.Author +"','"+ Article.Content +"','"+ Article.Tag +"', getDate())";
 		
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		console.log(recordset);
-	    		return recordset;
+	    		callback(recordset, err);
 	    	});
 		});
 	}
@@ -74,34 +84,27 @@ module.exports = function(){
 	}
 
 	return {
-		getSpecificAuthor: function(Id_No){
-			getSpecificAuthor(Id_No, function(articles){
-				return articles;
-			})
+		getNewestArticle: function(callback){
+			_getNewestArticle(callback);
 		},
-		getSpecificTag : function(Tag){
-			getSpecificTag(Tag, function(articles){
-				return articles;
-			})
+		getSpecificAuthor: function(Id_No, callback){
+			_getSpecificAuthor(Id_No, callback);
 		},
-		getSpecificArticle : function(ArticleNo){
-			_getSpecificArticle(ArticleNo, function(article){
-				return article;
-			})
+		getSpecificTag : function(Tag, callback){
+			_getSpecificTag(Tag, callback);
 		},
-		modifyArticle : function(Article){
+		getSpecificArticle : function(ArticleNo, callback){
+			_getSpecificArticle(ArticleNo, callback);
+		},
+		modifyArticle : function(Article, callback){
 			Article.Title = _replaceString(Article.Title);
 			Article.Content = _replaceString(Article.Content);
-			_modifyArticle(Article, function(article){
-				return article;
-			})
+			_modifyArticle(Article, callback);
 		},
-		publishArticle : function(Article){
+		publishArticle : function(Article, callback){
 			Article.Title = _replaceString(Article.Title);
 			Article.Content = _replaceString(Article.Content);
-			_publishArticle(Article, function(article){
-				return article;
-			})
+			_publishArticle(Article, callback);
 		}
 	}
 }();

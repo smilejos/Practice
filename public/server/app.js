@@ -169,12 +169,23 @@ nsp.on('connection', function(client){
 
     client.on('publish', function(item) {
         item.Author = client.request.session.user.UserName;
-        ArticleHandler.publishArticle(item);
+        ArticleHandler.publishArticle(item, function(recordset, err){
+            console.log('recordset', recordset);
+            console.log('err', err);
+        });
     });
 
     client.on('retrieveList', function(item) {
-        item.Author = client.request.session.user.UserName;
-        ArticleHandler.publishArticle(item);
+        if(item.isSpecificUser) {
+            ArticleHandler.getSpecificAuthor(item.Id_No, function(list){
+                client.emit('receiveList', list);
+            });
+            
+        } else {
+            ArticleHandler.getNewestArticle(function(list){
+                client.emit('receiveList', list);
+            });
+        }
     });
 
     client.on('retrieveArticle', function(item) {

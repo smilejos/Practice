@@ -80,14 +80,13 @@ module.exports = React.createClass({
         console.log(this.state.chatChannel);
         return (
             <div>
-                <h1>App</h1>
                 <RaisedButton label="Menu" onClick={this._handleToggle} />
                 <LeftNav open={this.state.isMenuOpen} >
                     <MenuItem onClick={this._handleToggle}><Link to="/about">About</Link></MenuItem>
                     <MenuItem onClick={this._handleToggle}><Link to="/creation">Creation</Link></MenuItem>
-                    <MenuItem onClick={this._handleToggle}><Link to="/article">Article</Link></MenuItem>
-                    <MenuItem onClick={this._handleToggle}><Link to="/article/N81101">N81101</Link></MenuItem>
-                    <MenuItem onClick={this._handleToggle}><Link to="/article/E10441">E10441</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/list">Article</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/list/N81101">N81101</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/list/E10441">E10441</Link></MenuItem>
                 </LeftNav>
                 <MemberList memberList={this.state.memberList} openChatBox={this._handleChatBoxOpen} />
                 <ChatChannel 
