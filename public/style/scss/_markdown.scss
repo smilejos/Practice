@@ -1,0 +1,66 @@
+.MarkdownEditor {
+	position: absolute;
+	width: 100%;
+	height: 800px;
+	background: #fff;
+
+	.MarkdownOutput {
+		position: relative;
+		width: 50%;
+		float: left;
+
+		.MarkdownTitle{
+			position: relative;
+			font-size: 18px;
+			font-weight: bolder;
+			line-height: 40px;
+			height: 40px;
+			width: 100%;
+		}
+		.markdown-body{
+			position: relative;
+			border: solid #eee 1px;
+			overflow: auto;
+			width: 100%;
+			height: 600px;
+		}
+	}
+	.MarkdownInput {
+		position: relative;
+		width: 50%;
+		float: left;
+
+		.MarkdownTitle{
+			position: relative;
+			font-size: 18px;
+			font-weight: bolder;
+			height: 40px;
+			line-height: 40px;
+			width: 100%;
+		}
+		.MarkdownTitleInput{
+			position:relative;
+			font-size: 18px;
+			font-weight: bolder;
+			height: 40px;
+			width: 95%;
+			border: solid #eee 1px;
+		}
+		.MarkdownArea{
+			position: relative;
+			border: solid #eee 1px;
+    		overflow: auto;
+    		padding: 0;
+    		outline: none;
+    		background-color: #fff;
+    		resize: none;
+			width: 100%;
+			height: 600px;
+		}
+		.MarkdownPost{
+			
+		}
+	}
+
+	
+}

@@ -1,22 +1,32 @@
 var React = require('react'),
-    Avatar = require('../common/Avatar.jsx');
+    Avatar = require('./Avatar.jsx');
+    MaterialUI = require('material-ui'),
+    List = MaterialUI.List,
+    ListItem = MaterialUI.ListItem;
 
 module.exports = React.createClass({
-	onAvatarClick: function() {
-	    
+    _getAvatar: function(url){
+        return (
+            <div className='MemberImage'>
+                <Avatar Id_No={this.props.user.Id_No} />
+            </div>
+        );
+    },
+	_handleClick: function() {
+        this.props.openChatBox({
+            target: this.props.user.SocketId,
+            Id_No: this.props.user.Id_No
+        });
   	},
     render: function() {
-        var url = 'http://cweb01/HRIS/EmployeePhoto/photo2/'+this.props.user.Id_no+'.jpg';
+        var AvatarImage = this._getAvatar();
         return (
-        	<div className='Member'>
-                <div>
-                    <Avatar avatar={url} onAvatarClick={this.onAvatarClick} />
-                </div>
-                <div>
-                    <div className='Name'>{this.props.user.Card_Na}</div>
-                    <div className='Title'>{this.props.user.Title_na}</div>
-                </div>
-        	</div>
+        	<ListItem
+                key={this.props.user.Id_No}
+                leftAvatar={ AvatarImage }
+                primaryText={this.props.user.Card_Na}
+                secondaryText={this.props.user.Title_na} 
+                onClick={this._handleClick} />
     	);
     }
-})
+});

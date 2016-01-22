@@ -5,16 +5,20 @@ var React = require('react'),
     IndexRoute = ReactRouter.IndexRoute,
     MainApp = require('../components/MainApp.jsx'),
     Default = require('../components/Default.jsx'),
-    AboutView = require('../components/About.jsx'),
-    WorkspaceView = require('../components/Workspace.jsx');
+    About = require('../components/About.jsx'),
+    List = require('../components/article/List.jsx'),
+    Article = require('../components/article/Article.jsx'),
+    Creation= require('../components/article/Creation.jsx');
 
 var routes = (
 	<Route path="/" component={MainApp} >
 		<IndexRoute component={Default} />
-        <Route path="about" component={AboutView}/>
-        <Route path="workspace" component={WorkspaceView}/>
+        <Route path="about" component={About}/>
+        <Route path="creation" component={Creation}/>
+        <Route path="list" component={List} />
+        <Route path="list/:userId" component={List}/>
+        <Route path="article/:articleId" component={Article}/>
     </Route>
 );
 
 module.exports = routes;
-

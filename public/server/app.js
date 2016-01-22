@@ -7,7 +7,8 @@ var express = require('express'),
     io = require('socket.io'),
     app = express(),
     ntlm = require('express-ntlm'),
-    MemberControler = require('../server/MemberControler');
+    MemberControler = require('../server/MemberControler'),
+    ArticleHandler = require('../server/ArticleHandler');
     // ReactDOMServer = require('react-dom/server'),
     // ReactRouter = require('react-Router'),
     // RoutingContext = ReactRouter.RoutingContext,
@@ -92,7 +93,8 @@ app.get('/style.css', function(req, res){
 });
 
 app.get('/codeStyle.css', function(req, res){
-    fs.readFile('./node_modules/highlight.js/styles/github-gist.css', function(err, data){
+    //fs.readFile('./node_modules/highlight.js/styles/github-gist.css', function(err, data){
+    fs.readFile('./node_modules/highlight.js/styles/vs.css', function(err, data){
         util.write(data, 'text/css', res);
     });
 });
@@ -113,30 +115,71 @@ socket.use(function(socket, next){
 });
 
 socket.sockets.on('connection', function(client) {          
-    var user = client.request.session.user;
-    if( user) {
-        var IdNo = user.UserName;
-        client.join(IdNo); // 讓每一個 Member 加入自己的 Channel
-        MemberControler.setOnline(IdNo);    
-    }
+    console.log('Common connected');
+    // var user = client.request.session.user;
+    // if( user) {
+    //     var IdNo = user.UserName;
+    //     client.join(IdNo); // 讓每一個 Member 加入自己的 Channel
+    //     MemberControler.setOnline(IdNo);    
+    // }
 
-    socket.emit('receiveRealTimeMember', {
-        List :  MemberControler.getOnlineList()
+    // socket.emit('receiveRealTimeMember', {
+    //     List :  MemberControler.getOnlineList()
+    // });
+    client.on('login', function(item) {
+        client.request.session.user.UserName = item.IdNo;
+        var self = MemberControler.setOnline(item.IdNo, client.id); 
+        socket.emit('receiveRealTimeMember', {
+            list : MemberControler.getOnlineList(),
+            self : self
+        });
     });
-    
+
     client.on('sendMessage', function(item) {
-        socket.to(item.Receiver).emit('receiveMessage', {
-            Sender : item.IdNo,
-            Message : item.Message,
-            DateTime : item.DateTime
+        socket.to(item.target).emit('receiveMessage', {
+            sender : client.request.session.user.UserName,
+            message : item.message,
+            dateTime : item.dateTime
         });
     });
 
     client.on('disconnect', function() {
-        MemberControler.setOffline(IdNo);
-        socket.emit('receiveRealTimeMember', {
-            List :  MemberControler.getOnlineList()
+        if(client.request.session.user && client.request.session.user.UserName){
+            MemberControler.setOffline(client.request.session.user.UserName);
+            socket.emit('receiveRealTimeMember', {
+                list :  MemberControler.getOnlineList()
+            });    
+        }
+    });
+
+    client.on('openChat', function(item) {
+        socket.to(item.target).emit('openChat', {
+            target: item.target,
+            Id_No: client.request.session.user.UserName
         });
+    });
+});
+
+
+
+var nsp = socket.of('/Article');
+
+nsp.on('connection', function(client){
+    console.log('Article connected');
+
+    client.on('publish', function(item) {
+        item.Author = client.request.session.user.UserName;
+        ArticleHandler.publishArticle(item);
+    });
+
+    client.on('retrieveList', function(item) {
+        item.Author = client.request.session.user.UserName;
+        ArticleHandler.publishArticle(item);
+    });
+
+    client.on('retrieveArticle', function(item) {
+        item.Author = client.request.session.user.UserName;
+        ArticleHandler.publishArticle(item);
     });
 });
 

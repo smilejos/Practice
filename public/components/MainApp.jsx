@@ -2,7 +2,9 @@ var React = require('react'),
     ReactRouter = require('react-router'),
     MaterialUI = require('material-ui'),
     io = require('socket.io-client'),
-    MemberList = require('../components/MemberList.jsx'),
+    CannelHandler = require('../client/ChannelHandler'),
+    MemberList = require('./MemberList.jsx'),
+    ChatChannel = require('./chat/ChatChannel.jsx'),
     LeftNav = MaterialUI.LeftNav,
     MenuItem = MaterialUI.MenuItem,
     RaisedButton = MaterialUI.RaisedButton,
@@ -15,52 +17,86 @@ module.exports = React.createClass({
         return {
             isMenuOpen: false,
             memberList: [],
-            chatChannel: {}
+            chatChannel: [],
+            selfUser: {}
         };
     },
     componentDidMount: function() {
         socket = io.connect();
         socket.on('receiveRealTimeMember', this._updateMemberList);
+        socket.on('openChat', this._receiveChatBoxOpen);
     },
     _updateMemberList: function(data) {
-        console.log(data.List);
         this.setState({
-            memberList : data.List
+            memberList : data.list,
+            selfUser : data.self
         });
     },
-    _receiveMessage: function(item){
-        console.log(item);
-        var _chatChannel = this.state.chatChannel;
-        if(_chatChannel[item.Sender]) {
-            var item = {
-                isOpen : true,
-                Message : this.state.chatChannel[item].splice(item.Message)
-            };
-            _chatChannel[item.Sender] = item;
-            this.setState({
-                chatChannel : _chatChannel
-            });
-        }
+    _handleChatBoxOpen: function(item){
+        console.log('send open', item);
+        socket.emit('openChat', item);
+        CannelHandler.setChannels(this.state.chatChannel);
+        CannelHandler.openChatBox(item.Id_No);
+        this.setState({
+            chatChannel : CannelHandler.getChannels()
+        });
     },
-    _sendMessage: function(item){
-        socket.emit('sendMessage', item);
+    _receiveChatBoxOpen: function(item){
+        console.log('receive open', item);
+        CannelHandler.setChannels(this.state.chatChannel);
+        CannelHandler.openChatBox(item.Id_No);
+        this.setState({
+            chatChannel : CannelHandler.getChannels()
+        });  
+    },
+    _sendMessage: function(message){
+        console.log('send message', message)
+        socket.emit('sendMessage', message);
+        CannelHandler.setChannels(this.state.chatChannel);
+        CannelHandler.postMessage(message);
+        this.setState({
+            chatChannel : CannelHandler.getChannels()
+        });
+    },
+    _receiveMessage: function(message){
+        console.log(message);
+        CannelHandler.setChannels(this.state.chatChannel);
+        CannelHandler.receiveMessage(message);
+        this.setState({
+            chatChannel : CannelHandler.getChannels()
+        });
+    },
+    _handleLogin: function(){
+        socket.emit('login', {
+            IdNo: this.refs.txtIdNo.value
+        });
     },
     _handleToggle: function () {
-        console.log('click');
         this.setState({
             isMenuOpen: !this.state.isMenuOpen
         });
     },
     render: function() {
+        console.log(this.state.chatChannel);
         return (
             <div>
                 <h1>App</h1>
                 <RaisedButton label="Menu" onClick={this._handleToggle} />
                 <LeftNav open={this.state.isMenuOpen} >
                     <MenuItem onClick={this._handleToggle}><Link to="/about">About</Link></MenuItem>
-                    <MenuItem onClick={this._handleToggle}><Link to="/workspace">Workspace</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/creation">Creation</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/article">Article</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/article/N81101">N81101</Link></MenuItem>
+                    <MenuItem onClick={this._handleToggle}><Link to="/article/E10441">E10441</Link></MenuItem>
                 </LeftNav>
-                <MemberList memberList={this.state.memberList} />
+                <MemberList memberList={this.state.memberList} openChatBox={this._handleChatBoxOpen} />
+                <ChatChannel 
+                    channels={this.state.chatChannel} 
+                    memberList={this.state.memberList} 
+                    selfUser={this.state.selfUser}
+                    sendMessage={this._sendMessage} />
+                <input type='text' ref='txtIdNo' />
+                <button onClick={this._handleLogin} >login</button>
                 {this.props.children}
             </div>
         );
