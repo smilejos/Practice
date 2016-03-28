@@ -8,7 +8,7 @@ module.exports = React.createClass({
     render: function() {
         var self = this;
         var MemberList = this.props.memberList.map(function(user, index){
-            return  <Member key={user.Id_no} user={user} openChatBox={self._handleClick} />
+            return  <Member key={user.Id_No} user={user} openChatBox={self._handleClick} />
         });
         return (
             <div className='MemberList'>

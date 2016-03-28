@@ -2,10 +2,11 @@ module.exports = function(){
 	var MemberControler = require('../server/MemberControler');
 	MemberControler.initialize();
 
-	function _login(client, item) {
+	function _login(socket, client, item) {
+		console.log('login item', item);
         client.request.session.user.UserName = item.IdNo;
         var self = MemberControler.setOnline(item.IdNo, client.id); 
-        client.emit('receiveRealTimeMember', {
+        socket.emit('receiveRealTimeMember', {
             list : MemberControler.getOnlineList(),
             self : self
         });
@@ -26,31 +27,31 @@ module.exports = function(){
         });
     };
 
-    function _disconnect(client) {
+    function _disconnect(socket, client) {
         console.log('Common disconnect', client.id);
         if(client.request.session.user && client.request.session.user.UserName){
             MemberControler.setOffline(client.request.session.user.UserName);
-            client.emit('receiveRealTimeMember', {
+            socket.emit('receiveRealTimeMember', {
                 list :  MemberControler.getOnlineList()
             });    
         }
     };
 
 	return {
-		listen: function(client) {
+		listen: function(socket, client) {
 			console.log('Common connected', client.id);
-			// var user = client.request.session.user;
-		    // if( user) {
-		    //     var IdNo = user.UserName;
-		    //     MemberControler.setOnline(IdNo);    
-		    // }
+			/*var user = client.request.session.user;
+		    if( user) {
+		        var IdNo = user.UserName;
+		        MemberControler.setOnline(IdNo);    
+		    }
 
-		    // socket.emit('receiveRealTimeMember', {
-		    //     List :  MemberControler.getOnlineList()
-		    // });
+		    client.emit('receiveRealTimeMember', {
+		        List :  MemberControler.getOnlineList()
+		    });*/
 
 			client.on('login', function(item) {
-		        _login(client, item);
+		        _login(socket, client, item);
 		    });
 
 	     	client.on('openChat', function(item) {
@@ -62,7 +63,7 @@ module.exports = function(){
 		    }); 
 
 		    client.on('disconnect', function() {
-		       _disconnect(client);
+		       _disconnect(socket, client);
 		    });
 		}
 	};

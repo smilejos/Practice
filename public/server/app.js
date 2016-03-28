@@ -122,7 +122,7 @@ socket.on('connection', function(client) {
 
 var common = socket.of('/Common');
 common.on('connection', function(client){
-    CommonRouter.listen(client);
+    CommonRouter.listen(common, client);
 });
 
 var article = socket.of('/Article');

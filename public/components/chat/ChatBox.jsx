@@ -51,8 +51,6 @@ module.exports = React.createClass({
             }
         });
         console.log('chat box target', this.props.target);
-        console.log(MessageList);
-        console.log(this._sendMessage);
         return (
         	<div className="chatBox" >
                 <div className='chatTitle'>

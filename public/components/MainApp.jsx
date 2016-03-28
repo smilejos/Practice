@@ -34,6 +34,7 @@ module.exports = React.createClass({
         console.log("componentDidUpdate");
     },
     _updateMemberList: function(data) {
+        console.log('receiveRealTimeMember', data);
         this.setState({
             memberList : data.list,
             selfUser : data.self
