@@ -7,8 +7,8 @@ var express = require('express'),
     io = require('socket.io'),
     app = express(),
     ntlm = require('express-ntlm'),
-    MemberControler = require('../server/MemberControler'),
-    ArticleHandler = require('../server/ArticleHandler');
+    CommonRouter = require('../server/CommonRouter'),
+    ArticleRouter = require('../server/ArticleRouter');
     // ReactDOMServer = require('react-dom/server'),
     // ReactRouter = require('react-Router'),
     // RoutingContext = ReactRouter.RoutingContext,
@@ -94,7 +94,8 @@ app.get('/style.css', function(req, res){
 
 app.get('/codeStyle.css', function(req, res){
     //fs.readFile('./node_modules/highlight.js/styles/github-gist.css', function(err, data){
-    fs.readFile('./node_modules/highlight.js/styles/vs.css', function(err, data){
+    //fs.readFile('./node_modules/highlight.js/styles/vs.css', function(err, data){
+    fs.readFile('./node_modules/highlight.js/styles/xcode.css', function(err, data){
         util.write(data, 'text/css', res);
     });
 });
@@ -105,8 +106,6 @@ app.get('/markdown.css', function(req, res){
     });
 });
 
-MemberControler.initialize();
-
 var server = app.listen(8888);
 var socket = io.listen(server);
 
@@ -114,84 +113,21 @@ socket.use(function(socket, next){
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-socket.sockets.on('connection', function(client) {          
-    console.log('Common connected');
-    // var user = client.request.session.user;
-    // if( user) {
-    //     var IdNo = user.UserName;
-    //     client.join(IdNo); // 讓每一個 Member 加入自己的 Channel
-    //     MemberControler.setOnline(IdNo);    
-    // }
-
-    // socket.emit('receiveRealTimeMember', {
-    //     List :  MemberControler.getOnlineList()
-    // });
-    client.on('login', function(item) {
-        client.request.session.user.UserName = item.IdNo;
-        var self = MemberControler.setOnline(item.IdNo, client.id); 
-        socket.emit('receiveRealTimeMember', {
-            list : MemberControler.getOnlineList(),
-            self : self
-        });
-    });
-
-    client.on('sendMessage', function(item) {
-        socket.to(item.target).emit('receiveMessage', {
-            sender : client.request.session.user.UserName,
-            message : item.message,
-            dateTime : item.dateTime
-        });
-    });
-
+socket.on('connection', function(client) {          
+    console.log('sockets connected', client.id);
     client.on('disconnect', function() {
-        if(client.request.session.user && client.request.session.user.UserName){
-            MemberControler.setOffline(client.request.session.user.UserName);
-            socket.emit('receiveRealTimeMember', {
-                list :  MemberControler.getOnlineList()
-            });    
-        }
-    });
-
-    client.on('openChat', function(item) {
-        socket.to(item.target).emit('openChat', {
-            target: item.target,
-            Id_No: client.request.session.user.UserName
-        });
+       console.log('sockets disconnect', client.id);
     });
 });
 
+var common = socket.of('/Common');
+common.on('connection', function(client){
+    CommonRouter.listen(client);
+});
 
-
-var nsp = socket.of('/Article');
-
-nsp.on('connection', function(client){
-    console.log('Article connected');
-
-    client.on('publish', function(item) {
-        item.Author = client.request.session.user.UserName;
-        ArticleHandler.publishArticle(item, function(recordset, err){
-            console.log('recordset', recordset);
-            console.log('err', err);
-        });
-    });
-
-    client.on('retrieveList', function(item) {
-        if(item.isSpecificUser) {
-            ArticleHandler.getSpecificAuthor(item.Id_No, function(list){
-                client.emit('receiveList', list);
-            });
-            
-        } else {
-            ArticleHandler.getNewestArticle(function(list){
-                client.emit('receiveList', list);
-            });
-        }
-    });
-
-    client.on('retrieveArticle', function(item) {
-        item.Author = client.request.session.user.UserName;
-        ArticleHandler.publishArticle(item);
-    });
+var article = socket.of('/Article');
+article.on('connection', function(client){
+    ArticleRouter.listen(client);
 });
 
 console.log("Start server with port:8888")

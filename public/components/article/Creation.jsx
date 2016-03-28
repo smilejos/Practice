@@ -8,7 +8,8 @@ module.exports = React.createClass({
 	getInitialState: function() {
     	return {
     			value: 'Type some *markdown* here!',
-    			title: 'Article Title'
+    			title: 'Article Title',
+                isNewArticle: false
 		};
   	},
   	componentDidMount: function() {
@@ -28,14 +29,31 @@ module.exports = React.createClass({
 				return require('highlight.js').highlight(lang, code).value;
 			}
 		});
+
+        if(this.props.params.articleNo) {
+            this.setState({
+                isNewArticle : true  
+            })
+
+            socket.emit('retrieveArticle', this.props.params.articleNo);
+            socket.on('retrieveArticle', this._retrieveArticle);
+        }
   	},
-  	handleChange: function() {
+    _retrieveArticle: function(Article){
+        this.refs.txtTitle.value = Article.Title;
+        this.refs.textarea.value = Article.Content;
+        this.setState({
+            value: Article.Content,
+            title: Article.Title,
+        });
+    },
+  	_handleChange: function() {
     	this.setState({value: this.refs.textarea.value});
   	},
-  	handleTitleChange: function(){
+  	_handleTitleChange: function(){
   		this.setState({title: this.refs.txtTitle.value});
   	},
-  	handleKeydown: function(e) {
+  	_handleKeydown: function(e) {
   		if (e.keyCode === 9) { // tab was pressed
             var val = this.refs.textarea.value,
                 start = this.refs.textarea.selectionStart,
@@ -46,7 +64,7 @@ module.exports = React.createClass({
             this.setState({value: this.refs.textarea.value});
         }
   	},
-  	handlePostArticle: function(){
+  	_handlePostArticle: function(){
         var Article = {
             Title : this.state.title,
             Author : '',
@@ -54,37 +72,42 @@ module.exports = React.createClass({
             Tag : ''
         };
 
-        socket.emit('publish', Article)
+        if( this.state.isNewArticle) {
+            Article.ArticleNo = this.props.params.articleNo;
+            socket.emit('update', Article);    
+        } else {
+            socket.emit('publish', Article);    
+        }
   	},
-  	renderMarkup: function() {
+  	_renderMarkup: function() {
   		var content = marked(this.state.value);
 	    return { __html: content};
   	},
-  	renderTitle: function(){
+  	_renderTitle: function(){
   		return (
   			<span>{this.state.title}</span>
-		)
+		  )
   	},
     render: function() {
         return (
     		<div className="MarkdownEditor">
     			<div className="MarkdownOutput">
     				<div className="MarkdownTitle">
-    					{this.renderTitle()}
+    					{this._renderTitle()}
     				</div>
-		        	<div className="markdown-body" dangerouslySetInnerHTML={this.renderMarkup()} />	
+		        	<div className="markdown-body" dangerouslySetInnerHTML={this._renderMarkup()} />	
 		        </div>
     			<div className='MarkdownInput'>
     				<div className="MarkdownTitle">
-    					<input type="text" ref="txtTitle" placeholder="Article Title" className="MarkdownTitleInput" onChange={this.handleTitleChange} />
+    					<input type="text" ref="txtTitle" placeholder="Article Title" className="MarkdownTitleInput" onChange={this._handleTitleChange} />
     				</div>
 			        <textarea
 			         	className="MarkdownArea"
-			          	onChange={this.handleChange}
-			          	onKeyDown={this.handleKeydown}
+			          	onChange={this._handleChange}
+			          	onKeyDown={this._handleKeydown}
 			          	ref="textarea"
 			          	defaultValue={this.state.value} />
-		          	<button ref="btn" className="MarkdownPost" onClick={this.handlePostArticle}>Post</button>
+		          	<button ref="btn" className="MarkdownPost" onClick={this._handlePostArticle}>Post</button>
 	          	</div>
 		    </div>
     	);

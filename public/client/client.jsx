@@ -17,6 +17,6 @@ var pathname = window.location.pathname,
 	location = pathname + search + hash;
 
 ReactRouter.match({ routes, location }, function(){
-  	ReactDom.render(<Router routes={routes} history={createHistory()} />, document.getElementById('app'));
+  	ReactDom.render(<Router routes={routes} history={browserHistory} />, document.getElementById('app'));
 });
 

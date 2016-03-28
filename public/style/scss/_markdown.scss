@@ -4,6 +4,7 @@
 	height: 800px;
 	background: #fff;
 
+
 	.MarkdownOutput {
 		position: relative;
 		width: 50%;
@@ -61,6 +62,32 @@
 			
 		}
 	}
+}
+.MarkdownDisplay{
+	position: relative;
+	width: 1000px;
+	height: auto;
+	padding: 50px;
+	background-color: #fff;
+	left: 50%;
+	margin-left: -500px;
 
-	
+	.MarkdownTitle{
+		position: relative;
+		font-size: 18px;
+		font-weight: bolder;
+		line-height: 40px;
+		height: 40px;
+		width: 100%;
+	}
+	.markdown-body{
+		position: relative;
+		border: solid #eee 1px;
+		overflow: auto;
+		width: 100%;
+	}
+
+	.MarkdownModify{
+
+	}
 }

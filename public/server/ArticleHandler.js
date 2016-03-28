@@ -50,7 +50,7 @@ module.exports = function(){
 		sql.connect(config, function(err) {
 			var request = new sql.Request();
 	    	request.query(sqlString, function(err, recordset) {
-	    		callback(recordset);
+	    		callback(recordset[0]);
 	    	});
 		});
 	}

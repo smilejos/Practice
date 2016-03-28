@@ -10,7 +10,6 @@ var React = require('react'),
     RaisedButton = MaterialUI.RaisedButton,
     Link = ReactRouter.Link;
 
-var socket; // 主要與 Server Side 溝通的窗口
 
 module.exports = React.createClass({
     getInitialState: function() {
@@ -18,13 +17,21 @@ module.exports = React.createClass({
             isMenuOpen: false,
             memberList: [],
             chatChannel: [],
-            selfUser: {}
+            selfUser: {},
+            socket: null
         };
     },
     componentDidMount: function() {
-        socket = io.connect();
-        socket.on('receiveRealTimeMember', this._updateMemberList);
-        socket.on('openChat', this._receiveChatBoxOpen);
+        console.log("componentDidMount");
+        if( ! this.state.socket ) {
+             this.state.socket = io('/Common'); 
+        }
+        
+        this.state.socket.on('receiveRealTimeMember', this._updateMemberList);
+        this.state.socket.on('openChat', this._receiveChatBoxOpen);
+    },
+    componentDidUpdate: function() {
+        console.log("componentDidUpdate");
     },
     _updateMemberList: function(data) {
         this.setState({
@@ -34,7 +41,7 @@ module.exports = React.createClass({
     },
     _handleChatBoxOpen: function(item){
         console.log('send open', item);
-        socket.emit('openChat', item);
+        this.state.socket.emit('openChat', item);
         CannelHandler.setChannels(this.state.chatChannel);
         CannelHandler.openChatBox(item.Id_No);
         this.setState({
@@ -51,7 +58,7 @@ module.exports = React.createClass({
     },
     _sendMessage: function(message){
         console.log('send message', message)
-        socket.emit('sendMessage', message);
+        this.state.socket.emit('sendMessage', message);
         CannelHandler.setChannels(this.state.chatChannel);
         CannelHandler.postMessage(message);
         this.setState({
@@ -67,7 +74,7 @@ module.exports = React.createClass({
         });
     },
     _handleLogin: function(){
-        socket.emit('login', {
+        this.state.socket.emit('login', {
             IdNo: this.refs.txtIdNo.value
         });
     },

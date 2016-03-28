@@ -31,7 +31,7 @@ module.exports = React.createClass({
                 return (
                     <div>
                         <MessageSender sender={item.Card_Na} />
-                        <Message message={item.message} />
+                        <MessageText message={item.message} />
                     </div>
                 );
             } else if (lastSender != item.Id_No) {
@@ -40,37 +40,40 @@ module.exports = React.createClass({
                     <div>
                         <SplitLine />
                         <MessageSender sender={item.Card_Na} />
-                        <Message message={item.message} />
+                        <MessageText message={item.message} />
                     </div>
                 );
             } else {
                 lastSender = item.Id_No;
                 return (
-                    <Message message={item.message} />
+                    <MessageText message={item.message} />
                 );
             }
         });
         console.log('chat box target', this.props.target);
+        console.log(MessageList);
+        console.log(this._sendMessage);
         return (
         	<div className="chatBox" >
                 <div className='chatTitle'>
-                    <AvatarImage />
+                    {AvatarImage}
                     <div className='chatTarget'>{this.props.target.Card_Na}</div>
                     <div className='chatNote'>{this.props.target.Title_na}</div>
                 </div>
-                // <div className='chatContent'>
-                    // {MessageList}
-                // </div>
-                // <div className='chatPostBar'>
-                    // <input type='text' ref='txtMessage' value='' />
-                    // <button onClick={this._sendMessage} >Send</button>
-                // </div>
+                <div className='chatContent'>
+                    {MessageList}
+                </div>
+                <div className='chatPostBar'>
+                    <input type='text' ref='txtMessage' value='' />
+                    <button onClick={this._sendMessage}>Send</button>
+                </div>
             </div>
     	);
     }
 })
 
-var Message = React.createClass({
+
+var MessageText = React.createClass({
     render: function() {
         return (
             <div className="message" >{this.props.message}</div>
